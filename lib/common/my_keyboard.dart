@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hangman/utils/utils.dart';
 
 class CustomKeyboard extends StatelessWidget {
   final void Function(String) onKeyPress;
@@ -33,18 +34,14 @@ class CustomKeyboard extends StatelessWidget {
   }
 
   Widget _buildKey(String key) {
-    return GestureDetector(
+    return InkWell(
       onTap: () => onKeyPress(key),
       child: Container(
         padding: const EdgeInsets.all(8),
         child: Center(
           child: Text(
             key,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 24,
-              fontWeight: FontWeight.w700,
-            ),
+            style: retroStyle(20, Colors.white, FontWeight.w700),
           ),
         ),
       ),

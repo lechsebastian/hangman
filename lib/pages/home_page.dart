@@ -67,7 +67,9 @@ class _GameScreenState extends State<GameScreen> {
                 style: retroStyle(35, Colors.white, FontWeight.w700),
               ),
               const SizedBox(height: 20),
-              CustomKeyboard.MyKeyboard(onKeyPress: (key) {}),
+              CustomKeyboard.MyKeyboard(onKeyPress: (key) {
+                print(key);
+              }),
             ],
           ),
         ),
