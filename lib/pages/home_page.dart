@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:hangman/common/my_keyboard.dart';
 import 'package:hangman/utils/utils.dart';
@@ -10,6 +12,26 @@ class GameScreen extends StatefulWidget {
 }
 
 class _GameScreenState extends State<GameScreen> {
+  String word = wordslist[Random().nextInt(wordslist.length)].toUpperCase();
+  List guessedLetters = [];
+  String handleText() {
+    String displayWord = '';
+    print(word);
+
+    for (int i = 0; i < word.length; i++) {
+      if (guessedLetters.contains(word[i])) {
+        setState(() {
+          displayWord += '${word[i]} ';
+        });
+      } else {
+        setState(() {
+          displayWord += '? ';
+        });
+      }
+    }
+    return displayWord;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -63,7 +85,7 @@ class _GameScreenState extends State<GameScreen> {
               ),
               const SizedBox(height: 30),
               Text(
-                '??????',
+                handleText(),
                 style: retroStyle(35, Colors.white, FontWeight.w700),
               ),
               const SizedBox(height: 20),
