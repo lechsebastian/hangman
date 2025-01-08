@@ -48,7 +48,6 @@ class _GameScreenState extends State<GameScreen> {
       });
     } else {
       setState(() {
-        lifes--;
         points -= 5;
       });
       print('Game Over');
@@ -108,9 +107,9 @@ class _GameScreenState extends State<GameScreen> {
                 ),
               ),
               const SizedBox(height: 20),
-              const Image(
+              Image(
                 image: AssetImage(
-                  'images/hangman0.png',
+                  'images/hangman${lifes - 1}.png',
                 ),
                 width: 155,
                 height: 155,
