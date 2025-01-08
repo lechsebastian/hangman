@@ -14,6 +14,9 @@ class GameScreen extends StatefulWidget {
 class _GameScreenState extends State<GameScreen> {
   String word = wordslist[Random().nextInt(wordslist.length)].toUpperCase();
   List guessedLetters = [];
+  int points = 0;
+  int lifes = 7;
+
   String handleText() {
     String displayWord = '';
     print(word);
@@ -30,6 +33,42 @@ class _GameScreenState extends State<GameScreen> {
       }
     }
     return displayWord;
+  }
+
+  checkLetter(String letter) {
+    if (word.contains(letter)) {
+      setState(() {
+        guessedLetters.add(letter);
+        points += 10;
+      });
+    } else if (lifes > 1) {
+      setState(() {
+        lifes--;
+        points -= 5;
+      });
+    } else {
+      setState(() {
+        lifes--;
+        points -= 5;
+      });
+      print('Game Over');
+    }
+
+    bool isWon = true;
+    for (int i = 0; i < word.length; i++) {
+      if (!guessedLetters.contains(word[i])) {
+        setState(() {
+          isWon = false;
+        });
+        break;
+      }
+    }
+    if (isWon) {
+      print('You won');
+      setState(() {
+        points += 30;
+      });
+    }
   }
 
   @override
@@ -64,7 +103,7 @@ class _GameScreenState extends State<GameScreen> {
                     const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
                 decoration: const BoxDecoration(color: Colors.lightBlueAccent),
                 child: Text(
-                  '12 points',
+                  '${points.toString()} points',
                   style: retroStyle(15, Colors.black, FontWeight.w700),
                 ),
               ),
@@ -80,7 +119,7 @@ class _GameScreenState extends State<GameScreen> {
               ),
               const SizedBox(height: 15),
               Text(
-                '7 lives left',
+                lifes > 1 ? '$lifes lifes left' : '$lifes life left',
                 style: retroStyle(17, Colors.grey, FontWeight.w700),
               ),
               const SizedBox(height: 30),
@@ -90,7 +129,7 @@ class _GameScreenState extends State<GameScreen> {
               ),
               const SizedBox(height: 20),
               CustomKeyboard.MyKeyboard(onKeyPress: (key) {
-                print(key);
+                checkLetter(key);
               }),
             ],
           ),
