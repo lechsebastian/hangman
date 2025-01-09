@@ -17,6 +17,48 @@ class _GameScreenState extends State<GameScreen> {
   int points = 0;
   int lifes = 7;
 
+  openDialog(String text) {
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+            side: const BorderSide(color: Colors.purpleAccent, width: 3),
+          ),
+          backgroundColor: Colors.lightBlueAccent,
+          title: Text(
+            text,
+            style: retroStyle(25, Colors.black, FontWeight.w700),
+          ),
+          content: Text(
+            'Points: $points',
+            style: retroStyle(20, Colors.black, FontWeight.w700),
+          ),
+          actions: [
+            TextButton(
+              child: Text(
+                'Play Again',
+                style: retroStyle(14, Colors.purpleAccent, FontWeight.w700),
+              ),
+              onPressed: () {
+                setState(() {
+                  word = wordslist[Random().nextInt(wordslist.length)]
+                      .toUpperCase();
+                  guessedLetters = [];
+                  points = 0;
+                  lifes = 7;
+                });
+                Navigator.pop(context);
+              },
+            )
+          ],
+        );
+      },
+    );
+  }
+
   String handleText() {
     String displayWord = '';
     print(word);
@@ -50,7 +92,7 @@ class _GameScreenState extends State<GameScreen> {
       setState(() {
         points -= 5;
       });
-      print('Game Over');
+      openDialog('GAME OVER!');
     }
 
     bool isWon = true;
@@ -63,7 +105,7 @@ class _GameScreenState extends State<GameScreen> {
       }
     }
     if (isWon) {
-      print('You won');
+      openDialog('YOU WON!');
       setState(() {
         points += 30;
       });
@@ -106,7 +148,7 @@ class _GameScreenState extends State<GameScreen> {
                   style: retroStyle(15, Colors.black, FontWeight.w700),
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 30),
               Image(
                 image: AssetImage(
                   'images/hangman${lifes - 1}.png',
@@ -126,7 +168,7 @@ class _GameScreenState extends State<GameScreen> {
                 handleText(),
                 style: retroStyle(35, Colors.white, FontWeight.w700),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 60),
               CustomKeyboard.MyKeyboard(onKeyPress: (key) {
                 checkLetter(key);
               }),
