@@ -1,5 +1,5 @@
 import 'dart:math';
-
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:hangman/common/my_keyboard.dart';
 import 'package:hangman/utils/utils.dart';
@@ -12,10 +12,15 @@ class GameScreen extends StatefulWidget {
 }
 
 class _GameScreenState extends State<GameScreen> {
+  AudioPlayer player = AudioPlayer();
   String word = wordslist[Random().nextInt(wordslist.length)].toUpperCase();
   List guessedLetters = [];
   int points = 0;
-  int lifes = 7;
+  int lifes = 6;
+
+  void playSound(String sound) async {
+    await player.play(AssetSource('sounds/$sound'));
+  }
 
   openDialog(String text) {
     showDialog(
@@ -48,8 +53,9 @@ class _GameScreenState extends State<GameScreen> {
                       .toUpperCase();
                   guessedLetters = [];
                   points = 0;
-                  lifes = 7;
+                  lifes = 6;
                 });
+                playSound('restart.mp3');
                 Navigator.pop(context);
               },
             )
@@ -83,16 +89,20 @@ class _GameScreenState extends State<GameScreen> {
         guessedLetters.add(letter);
         points += 10;
       });
+      playSound('correct.mp3');
     } else if (lifes > 1) {
       setState(() {
         lifes--;
         points -= 5;
       });
+      playSound('wrong.mp3');
     } else {
       setState(() {
+        lifes--;
         points -= 5;
       });
       openDialog('GAME OVER!');
+      playSound('lost.mp3');
     }
 
     bool isWon = true;
@@ -109,6 +119,7 @@ class _GameScreenState extends State<GameScreen> {
       setState(() {
         points += 30;
       });
+      playSound('won.mp3');
     }
   }
 
@@ -151,7 +162,7 @@ class _GameScreenState extends State<GameScreen> {
               const SizedBox(height: 30),
               Image(
                 image: AssetImage(
-                  'images/hangman${lifes - 1}.png',
+                  'assets/images/hangman$lifes.png',
                 ),
                 width: 155,
                 height: 155,
