@@ -17,9 +17,12 @@ class _GameScreenState extends State<GameScreen> {
   List guessedLetters = [];
   int points = 0;
   int lifes = 6;
+  bool soundOn = true;
 
   void playSound(String sound) async {
-    await player.play(AssetSource('sounds/$sound'));
+    if (soundOn) {
+      await player.play(AssetSource('sounds/$sound'));
+    }
   }
 
   openDialog(String text) {
@@ -135,10 +138,14 @@ class _GameScreenState extends State<GameScreen> {
         backgroundColor: Colors.black45,
         actions: [
           IconButton(
-            onPressed: () {},
-            icon: const Icon(
+            onPressed: () {
+              setState(() {
+                soundOn = !soundOn;
+              });
+            },
+            icon: Icon(
               size: 40,
-              Icons.volume_up_sharp,
+              soundOn ? Icons.volume_up_sharp : Icons.volume_off_sharp,
               color: Colors.purpleAccent,
             ),
           ),
