@@ -1,8 +1,10 @@
+import 'dart:convert';
 import 'dart:math';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:hangman/common/my_keyboard.dart';
 import 'package:hangman/utils/utils.dart';
+import 'package:http/http.dart' as http;
 
 class GameScreen extends StatefulWidget {
   const GameScreen({super.key});
@@ -13,16 +15,61 @@ class GameScreen extends StatefulWidget {
 
 class _GameScreenState extends State<GameScreen> {
   AudioPlayer player = AudioPlayer();
-  String word = wordslist[Random().nextInt(wordslist.length)].toUpperCase();
+  String word = '';
   List guessedLetters = [];
   List disabledKeys = [];
+  List<String> wordsBuffer = [];
   int points = 0;
   int lifes = 6;
   bool soundOn = true;
 
+  @override
+  void initState() {
+    super.initState();
+    fetchInitialWords();
+  }
+
   void playSound(String sound) async {
     if (soundOn) {
       await player.play(AssetSource('sounds/$sound'));
+    }
+  }
+
+  void playAgain() {
+    setState(() {
+      word = wordsBuffer[1].toUpperCase();
+      guessedLetters = [];
+      points = 0;
+      lifes = 6;
+      disabledKeys = [];
+    });
+
+    fetchWords(1).then((newWords) {
+      setState(() {
+        wordsBuffer[0] = wordsBuffer[1];
+        wordsBuffer[1] = newWords.first;
+      });
+    });
+
+    playSound('restart.mp3');
+  }
+
+  Future<void> fetchInitialWords() async {
+    final List<String> initialWords = await fetchWords(2);
+    setState(() {
+      wordsBuffer = initialWords;
+      word = wordsBuffer.first.toUpperCase();
+    });
+  }
+
+  Future<List<String>> fetchWords(int count) async {
+    final response = await http.get(
+      Uri.parse('https://random-word-api.herokuapp.com/word?number=$count'),
+    );
+    if (response.statusCode == 200) {
+      return List<String>.from(jsonDecode(response.body));
+    } else {
+      throw Exception('Failed to load random words');
     }
   }
 
@@ -52,15 +99,8 @@ class _GameScreenState extends State<GameScreen> {
                 style: retroStyle(14, Colors.purpleAccent, FontWeight.w700),
               ),
               onPressed: () {
-                setState(() {
-                  word = wordslist[Random().nextInt(wordslist.length)]
-                      .toUpperCase();
-                  guessedLetters = [];
-                  disabledKeys = [];
-                  points = 0;
-                  lifes = 6;
-                });
                 playSound('restart.mp3');
+                playAgain();
                 Navigator.pop(context);
               },
             )
@@ -162,51 +202,60 @@ class _GameScreenState extends State<GameScreen> {
         ],
       ),
       backgroundColor: Colors.black45,
-      body: SingleChildScrollView(
-        child: Center(
-          child: Column(
-            children: [
-              const SizedBox(height: 20),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
-                decoration: const BoxDecoration(color: Colors.lightBlueAccent),
-                child: Text(
-                  '${points.toString()} points',
-                  style: retroStyle(15, Colors.black, FontWeight.w700),
+      body: word.isEmpty
+          ? const Center(
+              child: CircularProgressIndicator(
+                color: Colors.purpleAccent,
+              ),
+            )
+          : SingleChildScrollView(
+              child: Center(
+                child: Column(
+                  children: [
+                    const SizedBox(height: 20),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 6, horizontal: 12),
+                      decoration:
+                          const BoxDecoration(color: Colors.lightBlueAccent),
+                      child: Text(
+                        '${points.toString()} points',
+                        style: retroStyle(15, Colors.black, FontWeight.w700),
+                      ),
+                    ),
+                    const SizedBox(height: 30),
+                    Image(
+                      image: AssetImage(
+                        'assets/images/hangman$lifes.png',
+                      ),
+                      width: 155,
+                      height: 155,
+                      color: Colors.white,
+                      fit: BoxFit.cover,
+                    ),
+                    const SizedBox(height: 15),
+                    Text(
+                      lifes > 1 ? '$lifes lifes left' : '$lifes life left',
+                      style: retroStyle(17, Colors.grey, FontWeight.w700),
+                    ),
+                    const SizedBox(height: 30),
+                    Center(
+                      child: Text(
+                        handleText(),
+                        style: retroStyle(35, Colors.white, FontWeight.w700),
+                      ),
+                    ),
+                    const SizedBox(height: 60),
+                    CustomKeyboard.MyKeyboard(
+                      onKeyPress: (key) {
+                        checkLetter(key);
+                      },
+                      disabledKeys: disabledKeys,
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 30),
-              Image(
-                image: AssetImage(
-                  'assets/images/hangman$lifes.png',
-                ),
-                width: 155,
-                height: 155,
-                color: Colors.white,
-                fit: BoxFit.cover,
-              ),
-              const SizedBox(height: 15),
-              Text(
-                lifes > 1 ? '$lifes lifes left' : '$lifes life left',
-                style: retroStyle(17, Colors.grey, FontWeight.w700),
-              ),
-              const SizedBox(height: 30),
-              Text(
-                handleText(),
-                style: retroStyle(35, Colors.white, FontWeight.w700),
-              ),
-              const SizedBox(height: 60),
-              CustomKeyboard.MyKeyboard(
-                onKeyPress: (key) {
-                  checkLetter(key);
-                },
-                disabledKeys: disabledKeys,
-              ),
-            ],
-          ),
-        ),
-      ),
+            ),
     );
   }
 }
