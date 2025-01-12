@@ -100,7 +100,7 @@ class _GameScreenState extends State<GameScreen> {
     if (word.contains(letter)) {
       setState(() {
         guessedLetters.add(letter);
-        points += 10;
+        points += 5;
       });
       playSound('correct.mp3');
     } else if (lifes > 1) {
@@ -130,7 +130,7 @@ class _GameScreenState extends State<GameScreen> {
     if (isWon) {
       openDialog('YOU WON!');
       setState(() {
-        points += 30;
+        points += 10;
       });
       playSound('won.mp3');
     }
