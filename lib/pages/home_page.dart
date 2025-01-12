@@ -15,6 +15,7 @@ class _GameScreenState extends State<GameScreen> {
   AudioPlayer player = AudioPlayer();
   String word = wordslist[Random().nextInt(wordslist.length)].toUpperCase();
   List guessedLetters = [];
+  List disabledKeys = [];
   int points = 0;
   int lifes = 6;
   bool soundOn = true;
@@ -55,6 +56,7 @@ class _GameScreenState extends State<GameScreen> {
                   word = wordslist[Random().nextInt(wordslist.length)]
                       .toUpperCase();
                   guessedLetters = [];
+                  disabledKeys = [];
                   points = 0;
                   lifes = 6;
                 });
@@ -87,6 +89,14 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   checkLetter(String letter) {
+    if (disabledKeys.contains(letter)) {
+      return;
+    }
+
+    setState(() {
+      disabledKeys.add(letter);
+    });
+
     if (word.contains(letter)) {
       setState(() {
         guessedLetters.add(letter);
@@ -187,9 +197,12 @@ class _GameScreenState extends State<GameScreen> {
                 style: retroStyle(35, Colors.white, FontWeight.w700),
               ),
               const SizedBox(height: 60),
-              CustomKeyboard.MyKeyboard(onKeyPress: (key) {
-                checkLetter(key);
-              }),
+              CustomKeyboard.MyKeyboard(
+                onKeyPress: (key) {
+                  checkLetter(key);
+                },
+                disabledKeys: disabledKeys,
+              ),
             ],
           ),
         ),
