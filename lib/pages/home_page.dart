@@ -88,9 +88,22 @@ class _GameScreenState extends State<GameScreen> {
             text,
             style: retroStyle(25, Colors.black, FontWeight.w700),
           ),
-          content: Text(
-            'Points: $points',
-            style: retroStyle(20, Colors.black, FontWeight.w700),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Points: $points',
+                style: retroStyle(20, Colors.black, FontWeight.w700),
+              ),
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  'Word: $word',
+                  style: retroStyle(20, Colors.black, FontWeight.w700),
+                ),
+              ),
+            ],
           ),
           actions: [
             TextButton(
@@ -240,9 +253,12 @@ class _GameScreenState extends State<GameScreen> {
                     ),
                     const SizedBox(height: 30),
                     Center(
-                      child: Text(
-                        handleText(),
-                        style: retroStyle(35, Colors.white, FontWeight.w700),
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          handleText(),
+                          style: retroStyle(35, Colors.white, FontWeight.w700),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 60),
