@@ -134,7 +134,7 @@ class _GameScreenState extends State<GameScreen> {
         });
       } else {
         setState(() {
-          displayWord += '? ';
+          displayWord += '_ ';
         });
       }
     }
